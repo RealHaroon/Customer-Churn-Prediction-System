@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Customer Churn Predictor</title>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 30px auto; }
+    textarea { width: 100%; height: 320px; font-family: Consolas, monospace; }
+    pre { background: #f6f6f6; padding: 12px; }
+  </style>
+</head>
+<body>
+  <h2>Customer Churn Prediction System</h2>
+  <p>Paste a single customer JSON payload and click Predict.</p>
+
+  <textarea id="payload">
+{
+  "gender": "Male",
+  "SeniorCitizen": 0,
+  "Partner": "Yes",
+  "Dependents": "No",
+  "tenure": 1,
+  "PhoneService": "No",
+  "MultipleLines": "No phone service",
+  "InternetService": "DSL",
+  "OnlineSecurity": "No",
+  "OnlineBackup": "Yes",
+  "DeviceProtection": "No",
+  "TechSupport": "No",
+  "StreamingTV": "No",
+  "StreamingMovies": "No",
+  "Contract": "Month-to-month",
+  "PaperlessBilling": "Yes",
+  "PaymentMethod": "Electronic check",
+  "MonthlyCharges": 29.85,
+  "TotalCharges": 29.85
+}
+  </textarea>
+
+  <button id="btnPredict">Predict</button>
+
+  <h3>Result</h3>
+  <pre id="result">(none)</pre>
+</body>
+</html>
