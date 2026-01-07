@@ -1,130 +1,136 @@
+
+
+# Customer Churn Prediction System (End-to-End)
+
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
+![Flask](https://img.shields.io/badge/Flask-2.x-green)
+![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.0%2B-orange)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
+
+A complete **end-to-end machine learning project** that predicts whether a telecom customer will churn. This project utilizes the [Telco Customer Churn dataset](https://www.kaggle.com/datasets/blastchar/telco-customer-churn) to build a training pipeline, exposes the model via a Flask REST API, and provides a user-friendly web interface.
+
+This repository demonstrates the full MLOps workflow: Data Cleaning → Preprocessing Pipeline → Model Training → Threshold Tuning → Model Persistence → REST API → Web UI.
+
+---
+
+## 📸 Demo
+
+*(Optional: Add a screenshot of your Web UI here)*
+
+- **Home UI:** `GET /` (Paste JSON payload and view prediction)
+- **Health Check:** `GET /health`
+- **Prediction API:** `POST /predict` (JSON input → JSON output)
+
+The API response includes:
+- `churn_probability`: The raw probability score from the model.
+- `churn_label`: `1` (Churn) or `0` (No Churn) based on a custom tuned threshold.
+- `threshold`: The specific threshold value used for the decision.
+
+---
+
+## 🏗️ What Was Built (Key Features)
+
+### 1. Data & Preprocessing
+- **Data Validation:** Loaded and validated dataset shape (7,043 rows, 21 columns).
+- **Data Cleaning:** Handled real-world dirty data, specifically converting `TotalCharges` from `object` to numeric and handling resulting `NaN` values.
+- ** robust Pipeline:**
+    - `ColumnTransformer` for handling mixed data types.
+    - `OneHotEncoder(handle_unknown="ignore")` to ensure the API doesn't crash on unseen categories.
+    - `StandardScaler` for normalizing numeric features.
+
+### 2. Modeling
+- **Algorithm:** Logistic Regression (Baseline).
+- **Pipeline Integration:** Used scikit-learn `Pipeline` to bundle preprocessing and modeling, preventing data leakage and ensuring consistency between training and inference.
+- **Threshold Tuning:** Instead of the default `0.5`, the classification threshold was tuned using the **Precision-Recall curve** to prioritize specific business metrics (e.g., Target Recall).
+
+### 3. Deployment
+- **Persistence:** Model artifacts saved using `joblib`.
+- **API:** Flask REST API handling JSON requests.
+- **Frontend:** A clean HTML/JS/CSS dashboard for testing predictions manually.
+
+---
+
+## 📂 Project Structure
+
 ```markdown
-# Customer Churn Prediction System (End-to-End) — Telco Dataset
-
-A complete **end-to-end machine learning project** that predicts whether a telecom customer will churn, using the Kaggle *Telco Customer Churn* dataset and a deployed Flask API + UI for real-time predictions. 
-
-This repo demonstrates the full workflow: data cleaning → preprocessing pipeline → model training → threshold tuning → model persistence → REST API → web UI. 
-
----
-
-## Demo (Local)
-
-- Home UI: `GET /` (paste JSON payload and get prediction)
-- Health check: `GET /health`
-- Prediction API: `POST /predict` (JSON → JSON)
-
-Your API response includes:
-- `churn_probability` (model probability)
-- `churn_label` (0/1 based on a tuned threshold)
-- `threshold` (stored threshold used for classification) 
-
----
-
-## What was built (skills shown)
-
-### Data & Preprocessing
-- Loaded and validated dataset shape + target distribution (7,043 rows, 21 columns). 
-- Fixed a real-world issue: `TotalCharges` type conversion (`object` → numeric) with blank values converted to missing (`NaN`).
-- Built a robust preprocessing pipeline using:
-  - `ColumnTransformer` for mixed numeric/categorical columns
-  - `OneHotEncoder(handle_unknown="ignore")` for safe inference on unseen categories
-  - `StandardScaler` for numeric features 
-
-### Modeling
-- Trained a baseline churn classifier using scikit-learn `Pipeline` so preprocessing + model stay consistent in training and inference.
-- Tuned a custom classification threshold using Precision-Recall trade-offs to hit a target churn recall rather than relying on default 0.5 threshold.
-
-### Deployment
-- Persisted model artifacts using `joblib` (re-loadable pipeline for inference). 
-- Built a Flask REST API that accepts JSON using `request.get_json()` and returns JSON using `jsonify`.
-- Added a simple Flask UI (templates + static JS) to test predictions in the browser. 
-
----
-
-## Model Behavior (Current)
-
-- Uses **Logistic Regression** with a tuned threshold stored in `models/threshold.json`. 
-- Output is **probability + label**, where:
-  - `churn_label = 1` if `churn_probability >= threshold`
-  - else `0`
-
----
-
-## Project Structure
-
-```text
 Customer-Churn-Prediction-System/
 ├── app/
-│   ├── app.py
-│   ├── app.js
-│   ├── static/
-│   └── templates/
+│   ├── app.py              # Main Flask application
+│   ├── static/             # CSS/JS files
+│   │   └── app.js
+│   └── templates/          # HTML templates
 │       └── index.html
 ├── data/
-│   ├── processed/
-│   └── raw/
+│   ├── processed/          # Cleaned data for training
+│   └── raw/                # Original dataset
 ├── models/
-│   ├── churn_pipeline.joblib
-│   ├── schema.json
-│   └── threshold.json
+│   ├── churn_pipeline.joblib  # Trained model pipeline
+│   ├── schema.json            # Expected input schema
+│   └── threshold.json         # Tuned threshold value
 ├── notebooks/
-│   └── Customer Churn EDA.ipynb
+│   └── Customer Churn EDA.ipynb  # Jupyter notebook for analysis
 ├── src/
-│   ├── client_test.py
-│   └── predict.py
+│   ├── client_test.py      # Script to test the API programmatically
+│   └── predict.py          # Prediction logic
+├── requirements.txt
 └── README.md
+
 ```
 
 ---
 
-## Setup (Windows / VS Code)
+## 🚀 Setup & Installation (Windows)
 
-### 1) Create & activate virtual environment
+### 1. Create & Activate Virtual Environment
+
 ```powershell
 python -m venv .venv
+# Activate in PowerShell:
 .venv\Scripts\Activate.ps1
+# Or in Command Prompt (cmd):
+# .venv\Scripts\activate.bat
+
 ```
 
-### 2) Install dependencies
+### 2. Install Dependencies
+
 ```powershell
 pip install -r requirements.txt
+
 ```
 
-> If you don’t have a `requirements.txt` yet, generate it after installing packages:
-```powershell
-pip freeze > requirements.txt
-```
+*> Note: If `requirements.txt` is missing, install necessary packages (flask, scikit-learn, pandas, numpy) and generate it: `pip freeze > requirements.txt*`
 
 ---
 
-## Run the Flask App
+## 🏃‍♂️ Running the Application
 
-From the project root:
+From the project root directory:
+
 ```powershell
 python -m app.app
+
 ```
 
-Then open:
-- `http://127.0.0.1:5000/` (UI)
-- `http://127.0.0.1:5000/health` (health check)
+Once the server starts, open your browser:
 
-Flask’s built-in server is fine for local testing; for production deployment you should use a WSGI server.
+* **UI:** [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+* **Health Check:** [http://127.0.0.1:5000/health](http://127.0.0.1:5000/health)
 
 ---
 
-## API Documentation
-
-### `GET /health`
-**Response**
-```json
-{ "status": "ok" }
-```
+## 🔌 API Documentation
 
 ### `POST /predict`
-**Request**
-- Content-Type: `application/json` (required for `request.get_json()` to work reliably)
 
-Example payload (one customer):
+Send a JSON object containing customer data to get a churn prediction.
+
+**Headers:**
+
+* `Content-Type: application/json`
+
+**Example Payload:**
+
 ```json
 {
   "gender": "Female",
@@ -147,52 +153,65 @@ Example payload (one customer):
   "MonthlyCharges": 20.0,
   "TotalCharges": 480.0
 }
+
 ```
 
-**Response**
+**Example Response:**
+
 ```json
 {
   "churn_probability": 0.0310,
   "churn_label": 0,
   "threshold": 0.4021
 }
+
 ```
 
 ---
 
-## Quick Testing
+## 🧪 Testing
 
-### Option A: Using the provided client
+### Option A: Python Client
+
+Run the included test script to simulate a client request:
+
 ```powershell
 python src/client_test.py
+
 ```
 
-### Option B: curl
-```bash
-curl -X POST http://127.0.0.1:5000/predict ^
+### Option B: cURL (Windows CMD)
+
+```cmd
+curl -X POST [http://127.0.0.1:5000/predict](http://127.0.0.1:5000/predict) ^
   -H "Content-Type: application/json" ^
-  -d "{\"gender\":\"Male\", ... }"
+  -d "{\"gender\":\"Male\", \"SeniorCitizen\": 0, \"Partner\": \"No\", \"Dependents\": \"No\", \"tenure\": 1, \"PhoneService\": \"No\", \"MultipleLines\": \"No phone service\", \"InternetService\": \"DSL\", \"OnlineSecurity\": \"No\", \"OnlineBackup\": \"Yes\", \"DeviceProtection\": \"No\", \"TechSupport\": \"No\", \"StreamingTV\": \"No\", \"StreamingMovies\": \"No\", \"Contract\": \"Month-to-month\", \"PaperlessBilling\": \"Yes\", \"PaymentMethod\": \"Electronic check\", \"MonthlyCharges\": 29.85, \"TotalCharges\": 29.85}"
+
 ```
 
 ---
 
-## Notes on Reproducibility
+## 📝 Reproducibility Notes
 
-- `models/churn_pipeline.joblib` contains the full scikit-learn pipeline (preprocessing + classifier), preventing training/inference mismatches. [web:347][web:153]
-- `models/schema.json` stores expected input columns to enforce correct field ordering and prevent silent errors.
-- `models/threshold.json` stores the tuned threshold used at inference time. 
+1. **`models/churn_pipeline.joblib`**: Contains the full pipeline (Preprocessing + Classifier). This ensures that the exact same transformations applied during training are applied during inference.
+2. **`models/schema.json`**: Stores the list of expected input columns. This is used to align the JSON input with the model's expected dataframe structure.
+3. **`models/threshold.json`**: Stores the optimal probability threshold derived during the EDA/Training phase.
 
 ---
 
-## Next Improvements (Planned)
+## 🔮 Roadmap (Future Improvements)
 
-- Add `src/train.py` to reproduce training + threshold selection from raw data end-to-end.
-- Add input validation + better error messages for missing/invalid fields.
-- Add `/predict_batch` for predicting multiple customers in one request.
-- Add model interpretation (feature importance / SHAP) and a short “business insights” section.
+* [ ] Add `src/train.py` to automate the training and threshold selection process.
+* [ ] Implement Pydantic for stricter input validation and error handling.
+* [ ] Add a `/predict_batch` endpoint for bulk processing.
+* [ ] integrate SHAP values to explain *why* a customer is at risk of churning.
 
 ---
 
 ## License
-MIT (or update as needed).
+
+MIT
+
+```
+
 ```
